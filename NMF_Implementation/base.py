@@ -8,10 +8,13 @@ from typing import Tuple
 class Implementation:
     def __init__(self, verbose=False):
         self.verbose = bool(verbose)
+
     def train(self, X):
         raise NotImplementedError(f'the train method on {self.__class__} has not been implemented')
+
     def fit(self, X):
         raise NotImplementedError(f'the fit method on {self.__class__} has not been implemented')
+
     def load_data(self, root: Path, xy: Tuple[int, int] = None):
         """
         Load ORL (or Extended YaleB) dataset to numpy array.
@@ -27,7 +30,6 @@ class Implementation:
         if xy:
             assert len(xy) == 2, f'xy must be None or 2 length tuple of integers. Got {xy}.'
             xy = tuple(map(int, xy))
-
 
         images, labels = [], []
 
@@ -59,15 +61,17 @@ class Implementation:
                 # convert image to numpy array.
 
                 # collect data and label.
-                images.append(img.reshape((-1,1)))
+                #images.append(img.reshape((-1,1)))
+                images.append(img)
                 labels.append(person_no)
 
         # concate all images and labels.
         print(len(images))
-        images = np.concatenate(images, axis=1)
+        #images = np.concatenate(images, axis=1)
+        images = np.stack(images)
         labels = np.array(labels)
 
-        return images.T, labels
+        return images, labels
 
     def preprocess(self, img):
         return img
