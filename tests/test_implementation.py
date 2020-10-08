@@ -8,14 +8,20 @@ def test_load_data_ORL():
     x, y = Implementation().load_data('data/ORL')
     assert x.shape[0] == 400
     assert y.shape == (400,)
+
 def test_load_data_resize():
     """test_load_data_resize.
     checks that the faces are being resized at all (no check to integrity)
     """
     x, y = Implementation().load_data('data/ORL', (3, 3))
-    assert x.shape[1] == 9
+    assert x.shape[1:] == (3, 3)
 
 def test_load_data_CroppedYale():
-    """test_load_data_CroppedYale."""
-    assert 0
+    """test_load_data_CroppedYale.
+
+    """
+    x, y = Implementation().load_data('data/CroppedYaleB', (3, 3))
+    print(x.shape)
+    #assert 0
+    assert x.shape[1:] == (3, 3)
 
