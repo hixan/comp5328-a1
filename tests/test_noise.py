@@ -1,6 +1,5 @@
 from NMF_Implementation.base import load_data
 from collections import Counter
-from my_tools.tools import inspect_array
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -66,6 +65,28 @@ def missing_grid(X, grid_spacing, grid_size=(0,0), grid_colors=(0,0), grid_offse
         idxs = idxs[idxs+i <= X.shape[2]]
         X[:, :, idxs] = grid_colors[1]
     return X
+
+
+def missing_rects(X, rect_size, nrow=2, ncol=2):
+
+    # construct a grid of what to show and use it as a mask for the image.
+    offset = 0, 0  # TODO this should also be calculated to handle rounding errors
+    # an additional mask will also have to be applied
+    grid_size = (
+        int((X.shape[1] - ncol * rect_size[0]) / (ncol + 1)),
+        int((X.shape[2] - nrow * rect_size[1]) / (nrow + 1))
+    )
+    grid_spacing = (
+        int((X.shape[1] - grid_size[0]) / ncol),
+        int((X.shape[2] - grid_size[1]) / nrow)
+    )
+    return X.copy() * missing_grid(
+            np.zeros(X.shape),
+            grid_spacing=grid_spacing,
+            grid_size=grid_size,
+            grid_colors=(True, True),
+            grid_offset=offset
+    ).astype(int)
 
 
 def test_salt_and_pepper():
