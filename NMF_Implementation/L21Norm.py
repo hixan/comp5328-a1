@@ -10,6 +10,7 @@ class Algorithm(Implementation):
         self._metavalues = dict(
             name = 'L2,1 Norm NMF',
             training_loss = [],
+            training_residue = [],
             components = components,
             max_iter = max_iter,
             initial_dictionary = initial_dictionary,
@@ -60,6 +61,41 @@ class Algorithm(Implementation):
 
         D: np.ndarray = self._dictionary  # alias for readability.
 
+        # toggle optimizing between D and R
+        optim = 'D'
+
+        # marker for different calls
+        self._metavalues['training_loss'].append(None)
+        self._metavalues['training_residue'].append(None)
+
+        # fit the data
+        for iteration in range(self._metavalues['max_iter'] * 2):  # *2 to account for alternation
+            # this section follows section 2.7 of the accompanied documentation in
+            # ../papers/Robust Nonnegative Matrix Factorization using L21 Norm 2011.pdf
+            diffs = X - D @ R
+            loss = l21_norm(diffs)
+            residue = np.linalg.norm(diffs)
+
+            # keep these for later
+            self._metavalues['training_loss'].append(loss)
+            self._metavalues['training_residue'].append(residue)
+
+            # TODO set optim='stop' based on some condition on the loss / residue.
+
+            diag = np.diag(1 / np.linalg.norm(diffs, axis=0))
+
+            if optim == 'D':
+                optim = 'R'  # toggle for next time
+                D *= (X @ diag @ R.T) / (D @ R @ diag @ R.T)
+            elif optim == 'R':
+                optim = 'D'
+                R *= (D.T @ X @ diag) / (D.T @ D @ R @ diag)
+
+            elif optim == 'stop':
+                break
+            else:
+                assert 0, 'optim not recognised'
+
     def transform(self, X):
         pass
 
@@ -77,3 +113,5 @@ class Algorithm(Implementation):
         """
         return self._metavalues
 
+def l21_norm(arr):
+    return np.sum(np.linalg.norm(arr, axis=1))
