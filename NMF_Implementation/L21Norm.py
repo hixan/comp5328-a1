@@ -28,15 +28,18 @@ class Algorithm(Implementation):
            'not match expected shape')
 
         # reshape the data to be vectors instead of images (if not already reshaped)
-        k: int = self._metavalues['components']
-        # if X is already 2 dimensional just returns the second dimension size
-        p: int = np.product(X.shape[1:])
         n: int = X.shape[0]
-        X: np.ndarray = np.reshape(X, (-1, p))
+        p: int = np.product(X.shape[1:])
+        k: int = self._metavalues['components']
+        X: np.ndarray = np.reshape(X, (-1, p)).T
 
-        # k - number of components
-        # p - dimensionality of population space
         # n - number of input images
+        # p - dimensionality of population space
+        # k - number of components
+
+        # X shape (p, n)
+        # D shape (p, k)
+        # R shape (k, n)
 
         # initialise the learning dictionary if not already initialised
         if self._metavalues['initial_dictionary'] is None:
