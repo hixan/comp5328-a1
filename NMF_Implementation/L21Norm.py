@@ -5,12 +5,14 @@ from .base import Implementation
 class Algorithm(Implementation):
 
     def __init__(self, components, max_iter=100, initial_dictionary=None, image_shape=None):
+        if initial_dictionary is not None:
+            initial_dictionary = initial_dictionary.copy()
         self._metavalues = dict(
             name = 'L2,1 Norm NMF',
             training_loss = [],
             components = components,
             max_iter = max_iter,
-            initial_dictionary = initial_dictionary.copy(),
+            initial_dictionary = initial_dictionary,
             image_shape = image_shape,
         )
         self._dictionary = None
@@ -48,9 +50,10 @@ class Algorithm(Implementation):
 
         # initialize representation
         if initial_representation is None:
-            R: np.ndarray = initial_representation.copy()
-        else:
             R: np.ndarray = np.random.rand(k, n)
+        else:
+            R: np.ndarray = initial_representation.copy()
+            assert R.shape == (k, n)
 
         D: np.ndarray = self._dictionary  # alias for readability.
 
