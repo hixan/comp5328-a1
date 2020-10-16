@@ -14,9 +14,17 @@ def gen_bool_index_random(arr, p):
     return bools
 
 
-def salt_and_pepper(X, p, r, max=255, min=0):
-    ''' add salt and pepper noise to a dataset of arrays.
-    '''
+def salt_and_pepper(X, p, r, salt=255, pepper=0):
+    """add salt and pepper noise to a dataset of arrays.
+
+    :param X: input data. Should take the shape of (n samples, *dimensions)
+    :param p: proportion of features to change.
+    :param r: proportion of changed features to change to salt
+    :param salt: value to replace with if designated to salt
+    :param min: value to replace with if designated to pepper
+    :return: X, but with p*r*100 % salt and p*(1-r)*100 % pepper.
+    """
+
     X = X.copy()
     shape = X.shape[1:]
     n = np.product(shape)
@@ -34,13 +42,13 @@ def salt_and_pepper(X, p, r, max=255, min=0):
     px = indecies.flatten()
     arr_indexes = np.column_stack((im, px)).T
     new_values = np.tile(
-            np.concatenate((np.ones(round(changed * r)) * 255,
-                np.zeros(changed - round(changed * r)))),
+            np.concatenate((np.ones(round(changed * r)) * salt,
+                np.ones(changed - round(changed * r)) * pepper)),
             X.shape[0]
     )
     X[arr_indexes[0], arr_indexes[1]] = new_values
 
-    return X
+    return np.reshape(X, (-1, *shape))
 
 def test_salt_and_pepper():
     # white image, grey image, black image (all 16x16
@@ -68,6 +76,7 @@ def test_salt_and_pepper():
     # all white
     print('all white')
     noise_x = salt_and_pepper(X, p=1.0, r=1.0)
+    assert noise_x.shape == X.shape
     new_makeup = makeup(noise_x)
     assert np.all(np.array(list(map(lambda x: len(x.keys()), new_makeup))) == 1)
     assert list(map(lambda x: next(iter(x.keys())), new_makeup)) == [255, 255, 255]
