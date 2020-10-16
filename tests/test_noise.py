@@ -50,6 +50,24 @@ def salt_and_pepper(X, p, r, salt=255, pepper=0):
 
     return np.reshape(X, (-1, *shape))
 
+
+def missing_grid(X, grid_spacing, grid_size=(0,0), grid_colors=(0,0), grid_offset=(0,0)):
+    X = X.copy()
+    assert len(X.shape) == 3, 'this function must recieve images as matrices instead of vectors'
+    xticks = np.arange(grid_offset[0], X.shape[1], grid_spacing[0])
+    yticks = np.arange(grid_offset[1], X.shape[2], grid_spacing[1])
+    for i in range(grid_size[0]):
+        idxs = xticks + i
+        idxs = idxs[idxs+i < X.shape[1]]
+        X[:, idxs, :] = grid_colors[0]
+
+    for i in range(grid_size[1]):
+        idxs = yticks + i
+        idxs = idxs[idxs+i < X.shape[2]]
+        X[:, :, idxs] = grid_colors[1]
+    return X
+
+
 def test_salt_and_pepper():
     # white image, grey image, black image (all 16x16
     X = (np.ones((3, 16, 16)) * np.tile(np.array([[[0, 128, 255]]]).T, (1,16,16))).astype(np.uint8)
