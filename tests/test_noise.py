@@ -58,12 +58,12 @@ def missing_grid(X, grid_spacing, grid_size=(0,0), grid_colors=(0,0), grid_offse
     yticks = np.arange(grid_offset[1], X.shape[2], grid_spacing[1])
     for i in range(grid_size[0]):
         idxs = xticks + i
-        idxs = idxs[idxs+i < X.shape[1]]
+        idxs = idxs[idxs+i <= X.shape[1]]
         X[:, idxs, :] = grid_colors[0]
 
     for i in range(grid_size[1]):
         idxs = yticks + i
-        idxs = idxs[idxs+i < X.shape[2]]
+        idxs = idxs[idxs+i <= X.shape[2]]
         X[:, :, idxs] = grid_colors[1]
     return X
 
