@@ -1,4 +1,5 @@
 from NMF_Implementation.base import Implementation, load_data
+show_results = False
 
 def test_load_data_ORL():
     """test_load_data_ORL.

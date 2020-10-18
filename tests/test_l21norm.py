@@ -1,5 +1,6 @@
 from NMF_Implementation import L21Norm
 from NMF_Implementation.base import load_data
+from .test_implementation import show_results
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -15,22 +16,20 @@ def test_fit():
     trans = alg.transform(X)
 
     # show first 5 components
-    for c in alg.transform(np.eye(15)[:5]):
+    for c in alg.inverse_transform(np.eye(15)[:7]):
         plt.imshow(c)
-        plt.show()
+        if show_results:
+            plt.show()
     
 
 def random(k, n, p, tolerance=None):
-    k = 15
-    n = 300
-    p = 30
 
     print(f"k={10}\nn={300}\np={15}")
     alg = L21Norm.Algorithm(k)
     data = np.random.randint(0, 255, (n, p))
     alg.fit(data)
     assert alg.transform(data).shape == (n, k)
-    assert alg.inverse_transform(np.random.randint(0, 255, (2*n, k))).shape == (2*n, k)
+    assert alg.inverse_transform(np.random.randint(0, 255, (2*n, k))).shape == (2*n, p)
 
     if tolerance is not None:
         # max deviation
@@ -43,5 +42,6 @@ def test_random_shapes():
     random(2, 50, 8)
 
 
-def test_random_values():
+def test_random_accuracy():
+    # should be able to predict well if there are more representations then inputs
     random(8, 50, 8, 0.01)
