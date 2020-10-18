@@ -1,0 +1,241 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{latex_template, times}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{stmaryrd}
+%\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
+
+\title{Assignment 1}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\nipsfinalcopy % Uncomment for camera-ready version
+
+\begin{document}
+
+\maketitle
+
+Tutors: (list all your tutors)\\
+Group members: Alex Elias (UniKey: ?, SID: ?) \& Luca Quaglia (UniKey: lqua3126, SID: 500175059)\\
+
+\begin{abstract}
+\textbf{In abstract, you should briefly introduce the topic of this assignment and describe the organization of your report.}\\
+
+The abstract paragraph should be indented 1/2~inch (3~picas) on both left and
+right-hand margins. Use 10~point type, with a vertical spacing of 11~points.
+The word \textbf{Abstract} must be centered, bold, and in point size 12. Two
+line spaces precede the abstract. The abstract must be limited to one
+paragraph.
+\end{abstract}
+
+\section{Introduction}
+\textbf{In introduction, you should firstly introduce the main idea of NMF as well as its applications. You should then give an overview of the methods you want to use.}
+
+\section{Related Work}
+\textbf{In related work, you are expected to review the main idea of related NMF algorithms (including their advantages and disadvantages).}
+
+\section{Methods}
+\textbf{In methods, you should describe the details of your method (including the definition of objective functions as well as optimization steps). You should also describe your choices of noise and you are encouraged to explain the robustness of each algorithm from theoretical view.}
+
+\subsection{Traditional NMF}
+The traditional NMF algorithm seeks to find, given a non-negative matrix $X$, two non-negative matrices $D$ and $R$ such that $X\approx DR$. To give a precise meaning to the approximate sign, the factorisation is expressed as a minimisation problem:
+
+\begin{equation}
+D, R = \argmin_{D\geq 0, R\geq 0}\lvert\lvert X - DR\rvert\rvert_{F}^{2}
+\end{equation}
+
+where $\lvert\lvert\cdot\rvert\rvert$ is the Frobenius norm of a matrix. For a matrix $A$ with elements $a_{ij}$, the (square) of the Frobenius norm is defined as:
+
+\begin{equation}
+\lvert\lvert A \rvert\rvert_{F}^{2} = \sum_{ij} a_{ij}^{2}
+\end{equation}
+
+The minimisation problem is convex in $D$ (keeping $R$ fixed) and it is convex in $R$ (keeping $D$ fixed) but not simultaneously in $D$ and in $R$. So it cannot be hoped to find with certainty the global minimum (the optimal $D$ and $R$) but only a local minimum. Gradient descent methods could be applied but convergence can be slow. So, multiplicative methods have been developed. These methods usually start from random guesses for $D$ and $R$ and iteratively update $D$ and $R$ using update formulae. For the traditional NMF, these update equations can be written as:
+
+\begin{equation}
+\begin{split}
+D_{ij} \mapsfrom D_{ij}\frac{(XR^{\top})_{ij}}{(DRR^{\top})_{ij}} \\
+R_{ij} \mapsfrom R_{ij}\frac{(D^{\top}X)_{ij}}{(D^{\top}DR)_{ij}}
+\end{split}
+\end{equation}   
+
+\subsection{}
+
+\section{Experiments}
+\textbf{In experiment, firstly, you should introduce the experimental setup (e.g. datasets, algorithms, and noise used in your experiment for comparison). Second, you should show the experimental results and give some comments.}
+
+\section{Conclusion}
+\textbf{In conclusion, you should summarize your results and discuss your insights for future work.}
+
+\subsubsection*{References}
+Use unnumbered third level heading for
+the references. Any choice of citation style is acceptable as long as you are
+consistent. It is permissible to reduce the font size to `small' (9-point)
+when listing the references.
+
+\small{
+[1] Alexander, J.A. \& Mozer, M.C. (1995) Template-based algorithms
+for connectionist rule extraction. In G. Tesauro, D. S. Touretzky
+and T.K. Leen (eds.), {\it Advances in Neural Information Processing
+Systems 7}, pp. 609-616. Cambridge, MA: MIT Press.
+
+[2] Bower, J.M. \& Beeman, D. (1995) {\it The Book of GENESIS: Exploring
+Realistic Neural Models with the GEneral NEural SImulation System.}
+New York: TELOS/Springer-Verlag.
+
+[3] Hasselmo, M.E., Schnell, E. \& Barkai, E. (1995) Dynamics of learning
+and recall at excitatory recurrent synapses and cholinergic modulation
+in rat hippocampal region CA3. {\it Journal of Neuroscience}
+{\bf 15}(7):5249-5262.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{General formatting instructions}
+\label{gen_inst}
+
+Please pay special attention to the instructions in section \ref{others}
+regarding figures, tables, acknowledgments, and references.
+
+\section{Headings: first level}
+\label{headings}
+
+First level headings are lower case (except for first word and proper nouns),
+flush left, bold and in point size 12. One line space before the first level
+heading and 1/2~line space after the first level heading.
+
+\subsection{Headings: second level}
+
+Second level headings are lower case (except for first word and proper nouns),
+flush left, bold and in point size 10. One line space before the second level
+heading and 1/2~line space after the second level heading.
+
+\subsubsection{Headings: third level}
+
+Third level headings are lower case (except for first word and proper nouns),
+flush left, bold and in point size 10. One line space before the third level
+heading and 1/2~line space after the third level heading.
+
+\section{Citations, figures, tables, references}
+\label{others}
+
+
+\subsection{Citations within the text}
+
+Citations within the text should be numbered consecutively. The corresponding
+number is to appear enclosed in square brackets, such as [1] or [2]-[5]. The
+corresponding references are to be listed in the same order at the end of the
+paper, in the \textbf{References} section. (Note: the standard
+\textsc{Bib\TeX} style \texttt{unsrt} produces this.) As to the format of the
+references themselves, any style is acceptable as long as it is used
+consistently.
+
+
+\subsection{Footnotes}
+
+Indicate footnotes with a number\footnote{Sample of the first footnote} in the
+text. Place the footnotes at the bottom of the page on which they appear.
+Precede the footnote with a horizontal rule of 2~inches
+(12~picas).\footnote{Sample of the second footnote}
+
+\subsection{Figures}
+
+All artwork must be neat, clean, and legible. Lines should be dark
+enough for purposes of reproduction; art work should not be
+hand-drawn. The figure number and caption always appear after the
+figure. Place one line space before the figure caption, and one line
+space after the figure. The figure caption is lower case (except for
+first word and proper nouns); figures are numbered consecutively.
+
+Make sure the figure caption does not get separated from the figure.
+Leave sufficient space to avoid splitting the figure and figure caption.
+
+You may use color figures.
+However, it is best for the
+figure captions and the paper body to make sense if the paper is printed
+either in black/white or in color.
+\begin{figure}[h]
+\begin{center}
+%\framebox[4.0in]{$\;$}
+\fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
+\end{center}
+\caption{Sample figure caption.}
+\end{figure}
+
+\subsection{Tables}
+
+All tables must be centered, neat, clean and legible. Do not use hand-drawn
+tables. The table number and title always appear before the table. See
+Table~\ref{sample-table}.
+
+Place one line space before the table title, one line space after the table
+title, and one line space after the table. The table title must be lower case
+(except for first word and proper nouns); tables are numbered consecutively.
+
+\begin{table}[t]
+\caption{Sample table title}
+\label{sample-table}
+\begin{center}
+\begin{tabular}{ll}
+\multicolumn{1}{c}{\bf PART}  &\multicolumn{1}{c}{\bf DESCRIPTION}
+\\ \hline \\
+Dendrite         &Input terminal \\
+Axon             &Output terminal \\
+Soma             &Cell body (contains cell nucleus) \\
+\end{tabular}
+\end{center}
+\end{table}
+
+
+
+\subsection{Margins in LaTeX}
+
+Most of the margin problems come from figures positioned by hand using
+\verb+\special+ or other commands. We suggest using the command
+\verb+\includegraphics+
+from the graphicx package. Always specify the figure width as a multiple of
+the line width as in the example below using .eps graphics
+\begin{verbatim}
+   \usepackage[dvips]{graphicx} ...
+   \includegraphics[width=0.8\linewidth]{myfile.eps}
+\end{verbatim}
+or % Apr 2009 addition
+\begin{verbatim}
+   \usepackage[pdftex]{graphicx} ...
+   \includegraphics[width=0.8\linewidth]{myfile.pdf}
+\end{verbatim}
+for .pdf graphics.
+See section 4.4 in the graphics bundle documentation (\url{http://www.ctan.org/tex-archive/macros/latex/required/graphics/grfguide.ps})
+
+A number of width problems arise when LaTeX cannot properly hyphenate a
+line. Please give LaTeX hyphenation hints using the \verb+\-+ command.
+
+
+
+\subsubsection*{References}
+Use unnumbered third level heading for
+the references. Any choice of citation style is acceptable as long as you are
+consistent. It is permissible to reduce the font size to `small' (9-point)
+when listing the references.
+
+\small{
+[1] Alexander, J.A. \& Mozer, M.C. (1995) Template-based algorithms
+for connectionist rule extraction. In G. Tesauro, D. S. Touretzky
+and T.K. Leen (eds.), {\it Advances in Neural Information Processing
+Systems 7}, pp. 609-616. Cambridge, MA: MIT Press.
+
+[2] Bower, J.M. \& Beeman, D. (1995) {\it The Book of GENESIS: Exploring
+Realistic Neural Models with the GEneral NEural SImulation System.}
+New York: TELOS/Springer-Verlag.
+
+[3] Hasselmo, M.E., Schnell, E. \& Barkai, E. (1995) Dynamics of learning
+and recall at excitatory recurrent synapses and cholinergic modulation
+in rat hippocampal region CA3. {\it Journal of Neuroscience}
+{\bf 15}(7):5249-5262.
+}
+
+\end{document}
