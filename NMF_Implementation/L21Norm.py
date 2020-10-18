@@ -17,8 +17,11 @@ class Algorithm(Implementation):
             image_shape = image_shape,
         )
         self._dictionary = None
+        self._inverse_dictionary = None
+
 
     def fit(self, X: np.ndarray, initial_representation=None):
+        """ Assumes first dimension of X represents rows of data """
 
         if self._metavalues['image_shape'] is None:
             # initialise default image shape if was not previously assigned
@@ -32,7 +35,8 @@ class Algorithm(Implementation):
         n: int = X.shape[0]
         p: int = np.product(X.shape[1:])
         k: int = self._metavalues['components']
-        X: np.ndarray = np.reshape(X, (-1, p)).T
+        X: np.ndarray = Algorithm._reshape_forward(X)
+        assert X.shape == (p, n)
 
         # n - number of input images
         # p - dimensionality of population space
@@ -96,22 +100,60 @@ class Algorithm(Implementation):
             else:
                 assert 0, 'optim not recognised'
 
+        self._inverse_dictionary = np.linalg.inv(D.T @ D) @ D.T
+
     def transform(self, X):
-        pass
+        """ Transform X into its representation
+        
+        :param X: row matrix/tensor of same shape as training time representing
+            data. If there are n images of size 10x5, X should be of shape
+            (n, 10, 5) or (n, 50) (depending on what was passed at training
+            time)
+        :return: row matrix (n, k) representing X.
+
+        Returns a row oriented matrix of representation vectors of X
+        """
+        print(X.shape)
+        return (self._inverse_dictionary @ Algorithm._reshape_forward(X)).T
 
     def inverse_transform(self, R):
-        pass
+        """ Transform representations of X back into X.
+
+        :param R: row oriented matrix of representation vectors
+        :return: row matrix/tensor of the same shape as input (barring first
+        dimension)
+        """
+        return self._reshape_backward(self._dictionary @ R.T)
 
     def get_metavalues(self):
         """ L21Norm.Algorithm.get_metavalues
 
         returns a dict with the following attributes:
         'name' : name of the algorithm
-        'training_loss' : loss of the algorithm at each iteration during training
+        'training_loss' : loss of the algorithm at each iteration during
+            training
         'components' : dimensionality of the representation vectors.
         'max_iter' : maximum number of iterations in training
         """
         return self._metavalues
+
+    @staticmethod
+    def _reshape_forward(mat):
+        """ transpose a row matrix or tensor to a column matrix """
+        if len(mat.shape) == 3:
+            return mat.reshape(mat.shape[0], -1).T
+        if len(mat.shape) == 2:
+            return mat.T
+        raise ValueError(f'expected a 2 or 3 dimensional matrix. Got a matrix '
+                'of shape {mat.shape}')
+
+    def _reshape_backward(self, mat):
+        """transpose a column matrix to a row matrix / tensor (dependant on
+        input to this class on training)"""
+        assert len(mat.shape) == 2, 'needs a matrix not a tensor'
+        newshape = self._metavalues['image_shape']
+        return mat.T.reshape(mat.shape[1], *newshape)
+
 
 def l21_norm(arr):
     return np.sum(np.linalg.norm(arr, axis=1))
