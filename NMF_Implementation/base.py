@@ -40,6 +40,24 @@ class Implementation:
         and training losses"""
         raise NotImplementedError
 
+    def reconstruction_error(self, X, Y):
+        """
+        After fitting using X (it assumes .fit(X) has been run),
+        it computes the reconstruction error of another array Y.
+        Y needs to be of the same shape as X.
+        Usually:
+        X is the noisy version of the dataset
+        Y is the clean version of the dataset
+        """
+
+        # compute the representation R of X and then multiply by D
+        DR = self.inverse_transform(self.transform(X))
+
+        # reconstruction error
+        reconstruction_error = np.linalg.norm(Y - DR) / np.linalg.norm(Y)
+
+        return reconstruction_error
+
 
 def load_data(root: Path, xy: Tuple[int, int] = None):
     """
