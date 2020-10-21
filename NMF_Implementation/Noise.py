@@ -88,6 +88,20 @@ def missing_rects(X, rect_size, nrow=2, ncol=2):
 
 
 def reconstruction_error_procedure(X, fraction, algorithm, noise_func):
+    """ Estimate reconstruction error for algorithm with noise_func
+
+    From all of X, take a sample without replacement of proportion `fraction`.
+    Add noise with `noise_func` and decompose then re-construct with `algorithm`.
+
+    Returns reconstruction error (:math:`\\left\\|X - \\widehat X\\right\\|_2`)
+
+    :param X: Whole input dataset
+    :param fraction: proportion of the dataset to 
+    :param algorithm: the decomposition object (untrained, will get trained)
+    :param noise_func: Callable that takes iterable of data and returns
+        np.ndarray of noisy data. (same order and dimensions)
+    :return: reconstruction error
+    """
 
     # total number of examples
     total_num_examples = X.shape[0]
@@ -96,7 +110,8 @@ def reconstruction_error_procedure(X, fraction, algorithm, noise_func):
     num_examples = math.floor(fraction * total_num_examples)
 
     # draw indices of example for the random subset
-    indices = np.random.choice(np.array(range(total_num_examples)), num_examples, replace=False)
+    indices = np.random.choice(np.array(range(total_num_examples)),
+                               num_examples, replace=False)
 
     # generate subset
     subset = X[indices]
