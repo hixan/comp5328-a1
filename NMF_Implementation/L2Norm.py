@@ -9,7 +9,7 @@ class Algorithm(Implementation):
         if initial_dictionary is not None:
             initial_dictionary = initial_dictionary.copy()
         self._metavalues = dict(
-            name='L2,1 Norm NMF',
+            name='L2 Norm NMF',
             training_loss=[],
             training_residue=[],
             components=components,
@@ -20,6 +20,9 @@ class Algorithm(Implementation):
         )
         self._dictionary = None
         self._inverse_dictionary = None
+
+        # added in order to double check 'inverse dictionary' computation
+        self.R = None
 
     def fit(self, X: np.ndarray, initial_representation=None):
         """ Assumes first dimension of X represents rows of data """
@@ -79,10 +82,12 @@ class Algorithm(Implementation):
             # this section follows section 2.7 of the accompanied documentation in
             # ../papers/Robust Nonnegative Matrix Factorization using L21 Norm 2011.pdf
 
+            diffs = X - D @ R
+
             # only collect the loss after D has been updated
             if optim == 'D':
-                diffs = X - D @ R
-                loss = l2_norm(diffs)
+                # average loss per example
+                loss = l2_norm(diffs) / n
                 residue = np.linalg.norm(diffs)
 
                 # keep these for later
@@ -111,6 +116,8 @@ class Algorithm(Implementation):
 
         self._inverse_dictionary = np.linalg.inv(D.T @ D) @ D.T
 
+        self.R = R
+
     def transform(self, X):
         """ Transform X into its representation
 
@@ -122,7 +129,6 @@ class Algorithm(Implementation):
 
         Returns a row oriented matrix of representation vectors of X
         """
-        print(X.shape)
         return (self._inverse_dictionary @ Algorithm._reshape_forward(X)).T
 
     def inverse_transform(self, R):
@@ -162,6 +168,24 @@ class Algorithm(Implementation):
         assert len(mat.shape) == 2, 'needs a matrix not a tensor'
         newshape = self._metavalues['image_shape']
         return mat.T.reshape(mat.shape[1], *newshape)
+
+    def reconstruction_error(self, X, Y):
+        """
+        After fitting using X (it assumes .fit(X) has been run),
+        it computes the reconstruction error of another array Y.
+        Y needs to be of the same shape as X.
+        Usually:
+        X is the noisy version of the dataset
+        Y is the clean version of the dataset
+        """
+
+        # compute the representation R of X and then multiply by D
+        DR = self.inverse_transform(self.transform(X))
+
+        # reconstruction error
+        reconstruction_error = np.linalg.norm(Y - DR) / np.linalg.norm(Y)
+
+        return reconstruction_error
 
 
 def l2_norm(arr):
