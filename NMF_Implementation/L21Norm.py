@@ -4,7 +4,7 @@ from .base import Implementation
 
 class Algorithm(Implementation):
 
-    def __init__(self, components, max_iter=100, initial_dictionary=None, image_shape=None):
+    def __init__(self, components, stop_threshold=0.01, max_iter=100, initial_dictionary=None, image_shape=None):
         if initial_dictionary is not None:
             initial_dictionary = initial_dictionary.copy()
         self._metavalues = dict(
@@ -12,12 +12,16 @@ class Algorithm(Implementation):
             training_loss = [],
             training_residue = [],
             components = components,
+            stop_threshold=stop_threshold,
             max_iter = max_iter,
             initial_dictionary = initial_dictionary,
             image_shape = image_shape,
         )
         self._dictionary = None
         self._inverse_dictionary = None
+
+        # added in order to double check 'inverse dictionary' computation
+        self.R = None
 
 
     def fit(self, X: np.ndarray, initial_representation=None):
@@ -66,7 +70,7 @@ class Algorithm(Implementation):
         D: np.ndarray = self._dictionary  # alias for readability.
 
         # toggle optimizing between D and R
-        optim = 'D'
+        optim = 'R'
 
         # marker for different calls
         self._metavalues['training_loss'].append(None)
@@ -76,15 +80,26 @@ class Algorithm(Implementation):
         for iteration in range(self._metavalues['max_iter'] * 2):  # *2 to account for alternation
             # this section follows section 2.7 of the accompanied documentation in
             # ../papers/Robust Nonnegative Matrix Factorization using L21 Norm 2011.pdf
+
             diffs = X - D @ R
-            loss = l21_norm(diffs)
-            residue = np.linalg.norm(diffs)
 
-            # keep these for later
-            self._metavalues['training_loss'].append(loss)
-            self._metavalues['training_residue'].append(residue)
+            # only collect the loss after D has been updated
+            if optim == 'D':
+                # average loss per example
+                loss = l21_norm(diffs) / n
+                residue = np.linalg.norm(diffs)
 
-            # TODO set optim='stop' based on some condition on the loss / residue.
+                # keep these for later
+                self._metavalues['training_loss'].append(loss)
+                self._metavalues['training_residue'].append(residue)
+
+                # computing if stopping condition is met
+                if iteration >= 2:
+                    previous_loss = self._metavalues['training_loss'][-1]
+                    current_loss = self._metavalues['training_loss'][-2]
+                    relative_improvement= - (previous_loss - current_loss) / previous_loss
+                    if relative_improvement < self._metavalues['stop_threshold']:
+                        optim = 'stop'
 
             diag = np.diag(1 / np.linalg.norm(diffs, axis=0))
 
@@ -102,6 +117,8 @@ class Algorithm(Implementation):
 
         self._inverse_dictionary = np.linalg.inv(D.T @ D) @ D.T
 
+        self.R = R
+
     def transform(self, X):
         """ Transform X into its representation
         
@@ -113,7 +130,6 @@ class Algorithm(Implementation):
 
         Returns a row oriented matrix of representation vectors of X
         """
-        print(X.shape)
         return (self._inverse_dictionary @ Algorithm._reshape_forward(X)).T
 
     def inverse_transform(self, R):
@@ -153,6 +169,24 @@ class Algorithm(Implementation):
         assert len(mat.shape) == 2, 'needs a matrix not a tensor'
         newshape = self._metavalues['image_shape']
         return mat.T.reshape(mat.shape[1], *newshape)
+
+    def reconstruction_error(self, X, Y):
+        """
+        After fitting using X (it assumes .fit(X) has been run),
+        it computes the reconstruction error of another array Y.
+        Y needs to be of the same shape as X.
+        Usually:
+        X is the noisy version of the dataset
+        Y is the clean version of the dataset
+        """
+
+        # compute the representation R of X and then multiply by D
+        DR = self.inverse_transform(self.transform(X))
+
+        # reconstruction error
+        reconstruction_error = np.linalg.norm(Y - DR) / np.linalg.norm(Y)
+
+        return reconstruction_error
 
 
 def l21_norm(arr):
