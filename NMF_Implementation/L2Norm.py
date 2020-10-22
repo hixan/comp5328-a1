@@ -98,10 +98,10 @@ class Algorithm(Implementation):
 
             if optim == 'D':
                 optim = 'R'  # toggle for next time
-                D *= (X @ R.T) / (D @ R @ R.T)
+                D *= (X @ R.T) / np.linalg.multi_dot((D, R, R.T))
             elif optim == 'R':
                 optim = 'D'
-                R *= (D.T @ X) / (D.T @ D @ R)
+                R *= (D.T @ X) / np.linalg.multi_dot((D.T, D, R))
 
             elif optim == 'stop':
                 break
