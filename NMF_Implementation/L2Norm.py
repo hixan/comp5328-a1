@@ -6,7 +6,7 @@ from .base import Implementation
 class Algorithm(Implementation):
 
     def __init__(self, components, stop_threshold=0.01, max_iter=200,
-            initial_dictionary=None, image_shape=None):
+            initial_dictionary=None, image_shape=None, stop_window=10):
         """ L2Norm NMF
 
         :param components: number of components to train
@@ -28,6 +28,7 @@ class Algorithm(Implementation):
             training_residue=[],
             components=components,
             stop_threshold=stop_threshold,
+            stop_window=stop_window,
             max_iter=max_iter,
             initial_dictionary=initial_dictionary,
             image_shape=image_shape,
@@ -118,11 +119,12 @@ class Algorithm(Implementation):
                 self._metavalues['training_residue'].append(residue)
 
                 # computing if stopping condition is met
-                if iteration >= 2:
-                    previous_loss = self._metavalues['training_loss'][-2]
+                if iteration // 2 - 1 > self._metavalues['stop_window']:
+                    previous_loss = self._metavalues['training_loss'
+                            ][-self._metavalues['stop_window']]
                     current_loss = self._metavalues['training_loss'][-1]
                     relative_improvement = ((previous_loss - current_loss) /
-                            previous_loss)
+                           self._metavalues['stop_window'] / previous_loss)
                     if relative_improvement < self._metavalues['stop_threshold']:
                         optim = 'stop'
 
