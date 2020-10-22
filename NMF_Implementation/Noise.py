@@ -93,7 +93,7 @@ def reconstruction_error_procedure(X, fraction, algorithm, noise_func):
     From all of X, take a sample without replacement of proportion `fraction`.
     Add noise with `noise_func` and decompose then re-construct with `algorithm`.
 
-    Returns reconstruction error (:math:`\\left\\|X - \\widehat X\\right\\|_2`)
+    Returns reconstruction error (:math:`{\\left\\|X - \\widehat X\\right\\|_2 \\over \\left\\|\\widehat X\\right\\|_2}`)
 
     :param X: Whole input dataset
     :param fraction: proportion of the dataset to 
@@ -110,8 +110,7 @@ def reconstruction_error_procedure(X, fraction, algorithm, noise_func):
     num_examples = math.floor(fraction * total_num_examples)
 
     # draw indices of example for the random subset
-    indices = np.random.choice(np.array(range(total_num_examples)),
-                               num_examples, replace=False)
+    indices = np.random.choice(total_num_examples, num_examples, replace=False)
 
     # generate subset
     subset = X[indices]
