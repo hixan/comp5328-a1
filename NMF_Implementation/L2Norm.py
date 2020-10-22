@@ -5,7 +5,21 @@ from .base import Implementation
 
 class Algorithm(Implementation):
 
-    def __init__(self, components, stop_threshold=0.01, max_iter=200, initial_dictionary=None, image_shape=None):
+    def __init__(self, components, stop_threshold=0.01, max_iter=200,
+            initial_dictionary=None, image_shape=None):
+        """ L2Norm NMF
+
+        :param components: number of components to train
+        :param stop_threshold: threshold under which the improvement (%) is
+            determined not worth it.
+        :param max_iter: maximum number of iterations (if stop_threshold does
+            not trigger)
+        :param initial_dictionary: Dictionary to use as initialization. None
+            indicates a random dictionary will be used
+        :param image_shape: shape of input images/matrices (if None it will be
+            implied from the data on first fit.
+        """
+
         if initial_dictionary is not None:
             initial_dictionary = initial_dictionary.copy()
         self._metavalues = dict(
