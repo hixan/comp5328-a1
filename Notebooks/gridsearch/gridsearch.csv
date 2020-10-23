@@ -166,3 +166,8 @@ components,proportion_noise,ratio_white,dataset,model_type,result_filenumber
 200,0.1,0.5,yale,l21,164
 200,0.1,0.5,yale,l2,165
 500,0.1,0.5,yale,l21,166
+1000,0.1,0.5,orl,l21,216
+1000,0.1,0.5,orl,l2,217
+1000,0.2,0.5,orl,l21,218
+1000,0.2,0.5,orl,l2,219
+1000,0.4,0.5,orl,l21,220
